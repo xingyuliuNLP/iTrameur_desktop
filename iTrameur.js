@@ -86,12 +86,9 @@ function createWindow() {
 // function to save a page offline
 function savePageOffline() {
   // pageTitle = win.getTitle()
-  // console.log("Saving:", pageTitle)
-  // const file = dialog.showSaveDialog();
   const filePath = dialog.showSaveDialog(win, {
     title: 'Save HTML',
-    defaultPath: app.getPath('documents'),
-    defaultPath: '../iTrameur_saved',
+    // defaultPath: '../iTrameur_saved',
     filters: [
       { name: 'HTML Files', extensions: '.html' }
     ]
@@ -99,7 +96,7 @@ function savePageOffline() {
   // If the user selects cancel in the File dialog box, aborts the function.
   if (!filePath) return;
   filePath.then(result => {
-    win.webContents.savePage(result.filePath + '.html', 'HTMLComplete').then(() => {
+    win.webContents.savePage(savedFolder + path.basename(result.filePath, '.html') + '.html', 'HTMLComplete').then(() => {
       appendItemToMenu(result.filePath + '.html');
       console.log('Page was saved successfully.')
     }).catch(err => {
@@ -115,7 +112,6 @@ function getSavedArticles() {
   if (!fs.existsSync(savedFolder)) {
     fs.mkdirSync(savedFolder);
   }
-  console.log(savedFolder)
   fs.readdirSync(savedFolder).forEach(file => {
     if (path.extname(file) == '.html') {
       appendItemToMenu(file)
