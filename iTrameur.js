@@ -1,10 +1,10 @@
-const { app, BrowserWindow, Menu, MenuItem } = require('electron')
-require('electron-reload')(__dirname)
+const { app, BrowserWindow, Menu, MenuItem, dialog, ipcMain } = require('electron')
+// require('electron-reload')(__dirname)
 const fs = require('fs')
 var path = require('path')
 
 // saved folder that would hold all the saved files
-const savedFolder = __dirname + '\\saved\\';
+const savedFolder = __dirname + '_saved/';
 
 // global variable that holds the app window
 let win;
@@ -12,16 +12,18 @@ let win;
 // menu template for the menubar
 let menu_template = [
   {
-    label: 'File',
+    label: 'F',
     submenu: [
       {
-        label: 'About',
+        label: 'Back to iTrameur',
+        accelerator: 'CommandOrControl+R',
         click() {
-          win.loadURL("http://www.tal.univ-paris3.fr/trameur/#iTrameur")
+          win.loadURL("http://www.tal.univ-paris3.fr/trameur/iTrameur")
         }
       },
       {
-        label: 'Quit iTrameur',
+        label: 'Quit',
+        accelerator: 'CommandOrControl+Q',
         click() {
           app.quit()
         }
@@ -33,120 +35,20 @@ let menu_template = [
     submenu: [
       {
         label: 'Save Page Offline',
+        accelerator: 'CommandOrControl+S',
         click() {
           savePageOffline()
         }
-      },
-      // { type: 'separator' },
-      // {
-      //   label: 'Exit',
-      //   click() {
-      //     app.quit()
-      //   }
-      // }
+      }
     ]
   },
-  // {
-  //   label: 'Site',
-  //   submenu: [
-  //     {
-  //       label: 'Login',
-  //       click() {
-  //         win.loadURL("https://auth.geeksforgeeks.org")
-  //       }
-  //     },
-  //     {
-  //       label: 'Logout',
-  //       click() {
-  //         win.loadURL("https://auth.geeksforgeeks.org/logout.php")
-  //       }
-  //     },
-  //   ]
-  // },
-  // {
-  //   label: 'Learn',
-  //   submenu: [
-  //     {
-  //       label: 'Quiz Corner',
-  //       click() {
-  //         win.loadURL("https://www.geeksforgeeks.org/quiz-corner-gq/")
-  //       }
-  //     },
-  //     {
-  //       label: 'Last Minute Notes',
-  //       click() {
-  //         win.loadURL("https://www.geeksforgeeks.org/lmns-gq/")
-  //       }
-  //     },
-  //     {
-  //       label: 'Interview Experiences',
-  //       click() {
-  //         win.loadURL("https://www.geeksforgeeks.org/company-interview-corner/")
-  //       }
-  //     },
-  //     {
-  //       label: 'Must-Do Questions',
-  //       click() {
-  //         win.loadURL("https://www.geeksforgeeks.org/must-do-coding-questions-for-companies-like-amazon-microsoft-adobe/")
-  //       }
-  //     }
-  //   ]
-  // },
-  // {
-  //   label: 'Practice Questions',
-  //   submenu: [
-  //     {
-  //       label: 'Online IDE',
-  //       click() {
-  //         // creating new browser window for IDE
-  //         ide_win = new BrowserWindow({
-  //           width: 800,
-  //           height: 450,
-  //         })
-
-  //         ide_win.loadURL("https://ide.geeksforgeeks.org")
-
-  //         // delete this window when closed
-  //         ide_win.on('closed', () => {
-  //           ide_win = null
-  //         })
-  //       }
-  //     },
-  //     { type: 'separator' },
-  //     {
-  //       label: 'Easy Questions',
-  //       click() {
-  //         win.loadURL("https://practice.geeksforgeeks.org/explore/?difficulty[]=0&page=1")
-  //       }
-  //     },
-  //     {
-  //       label: 'Medium Questions',
-  //       click() {
-  //         win.loadURL("https://practice.geeksforgeeks.org/explore/?difficulty[]=1&page=1")
-  //       }
-  //     },
-  //     {
-  //       label: 'Hard Questions',
-  //       click() {
-  //         win.loadURL("https://practice.geeksforgeeks.org/explore/?difficulty[]=2&page=1")
-  //       }
-  //     },
-  //     { type: 'separator' },
-  //     {
-  //       label: 'Latest Questions',
-  //       click() {
-  //         win.loadURL("https://practice.geeksforgeeks.org/recent.php")
-  //       }
-  //     }
-  //   ]
-  // },
-   {
+  {
     id: 'saved',
-    label: 'Saved Articles',
+    label: 'Saved Results',
     submenu: []
   },
   {
-    label: 'Help',
+    label: 'About',
     submenu: [
       {
         label: 'Trameur',
@@ -154,18 +56,6 @@ let menu_template = [
           win.loadURL("http://www.tal.univ-paris3.fr/trameur/#iTrameur")
         }
       },
-    //   {
-    //     label: 'Pick Suggested Article',
-    //     click() {
-    //       win.loadURL("https://contribute.geeksforgeeks.org/request-article/request-article.php#pickArticleDiv")
-    //     }
-    //   },
-    //   {
-    //     label: 'Write Interview Experience',
-    //     click() {
-    //       win.loadURL("https://contribute.geeksforgeeks.org/wp-admin/post-new.php?interview_experience")
-    //     }
-    //   }
     ]
   }
 ];
@@ -175,7 +65,7 @@ function createWindow() {
   // creating the browser window.
   win = new BrowserWindow({
     width: 960,
-    height: 540,
+    height: 600,
   })
 
   // load automatically redirecting url to login and feed
@@ -183,13 +73,6 @@ function createWindow() {
 
   win.on('closed', () => {
     win = null
-  })
-
-  // prevent from spawning new window
-  win.webContents.on('new-window', (event, url) => {
-
-    event.preventDefault()
-    win.loadURL(url)
   })
 
   // build the template and use the menu
@@ -201,21 +84,34 @@ function createWindow() {
 
 // function to save a page offline
 function savePageOffline() {
-  pageTitle = win.getTitle()
-  console.log("Saving:", pageTitle)
+  // pageTitle = win.getTitle()
+  // console.log("Saving:", pageTitle)
+  // const file = dialog.showSaveDialog();
+  const file = dialog.showSaveDialog({
+    title: 'Save HTML',
+    // defaultPath: app.getPath('documents'),
+    defaultPath: '../iTrameur_saved',
+    filters: [
+      { name: 'HTML Files', extensions: '.html' }
+    ]
+  });
+  // If the user selects cancel in the File dialog box, aborts the function.
+  if (!file) return;
 
-  win.webContents.savePage(savedFolder + pageTitle + '.html', 'HTMLComplete').then(() => {
-    appendItemToMenu(pageTitle + '.html');
+
+  win.webContents.savePage(savedFolder + file + '.html', 'HTMLComplete').then(() => {
+    appendItemToMenu(file);
     console.log('Page was saved successfully.')
   }).catch(err => {
     console.log(err)
-  })
+  });
 }
+
 
 // function to get all saved articles
 // and update the menu
 function getSavedArticles() {
-  // create new firectory if it does not exist
+  // create new directory if it does not exist
   if (!fs.existsSync(savedFolder)) {
     fs.mkdirSync(savedFolder);
   }
@@ -230,6 +126,7 @@ function getSavedArticles() {
 // function to append the given
 // page to the submenu
 function appendItemToMenu(filename) {
+  const newMenu = Menu.getApplicationMenu()
   curr_menu = Menu.getApplicationMenu().getMenuItemById("saved").submenu
 
   curr_menu.append(
@@ -240,6 +137,7 @@ function appendItemToMenu(filename) {
         win.loadFile(savedFolder + path.basename(filename))
       }
     }))
+  Menu.setApplicationMenu(newMenu)
 }
 
 // executing the createWindow function
