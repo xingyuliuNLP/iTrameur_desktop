@@ -91,7 +91,7 @@ function savePageOffline() {
   const filePath = dialog.showSaveDialog(win, {
     title: 'Save HTML',
     defaultPath: app.getPath('documents'),
-    // defaultPath: '../iTrameur_saved',
+    defaultPath: '../iTrameur_saved',
     filters: [
       { name: 'HTML Files', extensions: '.html' }
     ]
@@ -99,7 +99,7 @@ function savePageOffline() {
   // If the user selects cancel in the File dialog box, aborts the function.
   if (!filePath) return;
   filePath.then(result => {
-    win.webContents.savePage(savedFolder + result.filePath + '.html', 'HTMLComplete').then(() => {
+    win.webContents.savePage(result.filePath + '.html', 'HTMLComplete').then(() => {
       appendItemToMenu(result.filePath + '.html');
       console.log('Page was saved successfully.')
     }).catch(err => {
