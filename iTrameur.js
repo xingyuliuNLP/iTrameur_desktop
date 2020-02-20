@@ -100,7 +100,7 @@ function savePageOffline() {
   if (!filePath) return;
   filePath.then(result => {
     win.webContents.savePage(savedFolder + result.filePath + '.html', 'HTMLComplete').then(() => {
-      appendItemToMenu(result.filePath);
+      appendItemToMenu(result.filePath + '.html');
       console.log('Page was saved successfully.')
     }).catch(err => {
       console.log(err)
