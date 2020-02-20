@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, MenuItem, dialog, ipcMain } = require('electron')
+const { app, BrowserWindow, Menu, MenuItem, dialog, remote } = require('electron')
 // require('electron-reload')(__dirname)
 const fs = require('fs')
 var path = require('path')
@@ -34,6 +34,7 @@ let menu_template = [
     label: 'File',
     submenu: [
       {
+        id: 'offline',
         label: 'Save Page Offline',
         accelerator: 'CommandOrControl+S',
         click() {
@@ -87,26 +88,25 @@ function savePageOffline() {
   // pageTitle = win.getTitle()
   // console.log("Saving:", pageTitle)
   // const file = dialog.showSaveDialog();
-  const file = dialog.showSaveDialog({
+  const filePath = dialog.showSaveDialog(win, {
     title: 'Save HTML',
-    // defaultPath: app.getPath('documents'),
-    defaultPath: '../iTrameur_saved',
+    defaultPath: app.getPath('documents'),
+    // defaultPath: '../iTrameur_saved',
     filters: [
       { name: 'HTML Files', extensions: '.html' }
     ]
   });
   // If the user selects cancel in the File dialog box, aborts the function.
-  if (!file) return;
-
-
-  win.webContents.savePage(savedFolder + file + '.html', 'HTMLComplete').then(() => {
-    appendItemToMenu(file);
-    console.log('Page was saved successfully.')
-  }).catch(err => {
-    console.log(err)
+  if (!filePath) return;
+  filePath.then(result => {
+    win.webContents.savePage(savedFolder + result.filePath + '.html', 'HTMLComplete').then(() => {
+      appendItemToMenu(result.filePath);
+      console.log('Page was saved successfully.')
+    }).catch(err => {
+      console.log(err)
+    })
   });
 }
-
 
 // function to get all saved articles
 // and update the menu
@@ -115,7 +115,7 @@ function getSavedArticles() {
   if (!fs.existsSync(savedFolder)) {
     fs.mkdirSync(savedFolder);
   }
-
+  console.log(savedFolder)
   fs.readdirSync(savedFolder).forEach(file => {
     if (path.extname(file) == '.html') {
       appendItemToMenu(file)
@@ -127,7 +127,7 @@ function getSavedArticles() {
 // page to the submenu
 function appendItemToMenu(filename) {
   const newMenu = Menu.getApplicationMenu()
-  curr_menu = Menu.getApplicationMenu().getMenuItemById("saved").submenu
+  curr_menu = newMenu.getMenuItemById("saved").submenu
 
   curr_menu.append(
     new MenuItem({
