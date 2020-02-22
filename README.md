@@ -34,4 +34,4 @@ electron-packager
 ## Features
 - [x] Add save page offline function (2020-02-20)
 - [ ] Add opening window. Buttons: iTameur, Quiz ...
-- [ ] How to load (arbor.js)[http://arborjs.org/]?
+- [ ] How to load [arbor.js](http://arborjs.org/)?
