@@ -29,3 +29,9 @@ electron-packager
 - The *platform* and *architecture* could be specified if one is developing for a certain platform. Running the packager specifying only the *sourcedir* and *appname* will produce a bundle that could only be run on the host platform/architecture:
   
 `electron-packager . iTrameur`
+
+
+## Features
+- [x] Add save page offline function (2020-02-20)
+- [ ] Add opening window. Buttons: iTameur, Quiz ...
+- [ ] How to load (arbor.js)[http://arborjs.org/]?
