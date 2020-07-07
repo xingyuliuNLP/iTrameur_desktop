@@ -13,7 +13,7 @@
   "author": "chui",
   "license": "ISC",
   "dependencies": {
-    "electron": "^8.0.0",
+    "electron": "^8.2.4",
     "electron-reload": "^1.5.0"
   }
 }
