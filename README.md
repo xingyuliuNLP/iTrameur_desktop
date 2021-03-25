@@ -1,10 +1,18 @@
 # iTrameur Desktop
 
+Ce projet a pour but de fournir à la communauté de TAL en France une version Desktop du logiciel [iTrameur](http://www.tal.univ-paris3.fr/trameur/iTrameur/).
+
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
+## Développeurs
+
+[Xiaoou WANG](xiaoouwang.githun.io)
+
+[Xingyu LIU](https://github.com/xingyuliuNLP)
 
 ## Why
 
-- The application using Electron that acts as a wrapper around the [iTrameur](http://www.tal.univ-paris3.fr/trameur/iTrameur/) website maintained by M.Serge Fleury. It contains the ability to quickly navigate to all parts of the website and save results that could be later read **offline**.
+- The application using Electron that acts as a wrapper around the [iTrameur](http://www.tal.univ-paris3.fr/trameur/iTrameur/) website maintained by M. Serge Fleury. It contains the ability to quickly navigate to all parts of the website and save results that could be later read **offline**.
   
 - Furthermore, the ressources (free accessed) used in our formation **T**raitement **A**utomatique des **L**angues will be integrated in this app by adding menu items. 
   
